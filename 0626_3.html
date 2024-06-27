@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>당신이 사용 가능한 스킬을 체크하시오</h1>
+    <form>
+        <label for="ability1"><input type="checkbox" id="ability1" value="HTML" /> HTML</label>
+        <label for="ability2"><input type="checkbox" id="ability2" value="CSS" /> CSS</label>
+        <label for="ability3"><input type="checkbox" id="ability3" value="Javascript" /> Javascript</label>
+        <label for="ability4"><input type="checkbox" id="ability4" value="React" /> React</label>
+    </form>
+    <button onClick="getResult()">합격여부체크</button>
+    <h2>결과</h2>
+    <div id="result"></div>
+
+    <script>
+        let result = document.getElementById("result")
+        function getResult() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            let checkList = []
+            checkboxes.forEach((item) => {
+                if (item.checked) {
+                    checkList.push(item.value)
+                }
+            })
+            console.log('체크된리스트', checkList)
+            const arrPass = ["HTML", "CSS", "Javascript", "React"]
+            const arrSpair = ["HTML", "CSS", "Javascript"]
+
+            if (arrPass.every(item => checkList.includes(item))) {
+                result.innerText = "합격"
+            } else if (arrSpair.every(item => checkList.includes(item))) {
+                result.innerText = "예비"
+            } else {
+                result.innerText = "탈락"
+            }
+        }
+    </script>
+</body>
+
+</html>

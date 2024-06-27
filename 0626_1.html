@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <!-- 1. prompt로 입력을 받는다 
+        2. 입력받은 값은 string이므로 Number로 형변환하여 리턴해줌
+        3. NaN인지 판별은 isNaN함수를 이용한다. userNum이 NaN이면 계속 prompt입력을 받고 isNaN이면 break됨
+        4. 양수인지 음수인지 판별함 
+    -->
+    <h1>음수양수판별</h1>
+    <div id="result"></div>
+    <script>
+        function userInput() {
+            let userNum = prompt("숫자를 입력하시오")
+            return Number(userNum)
+        }
+
+        function isPositive() {
+            let userNum = userInput()
+            console.log(userNum)
+            while (isNaN(userNum)) {
+                userNum = userInput()
+            }
+
+            userNum >= 0
+                ? document.getElementById("result").innerText = "양수"
+                : document.getElementById("result").innerText = "음수"
+        }
+
+        isPositive();
+    </script>
+</body>
+
+</html>

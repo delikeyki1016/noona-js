@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>당신의 레포트 성적</h1>
+    <div id="score"></div>
+
+    <script>
+        let yourScore = prompt("당신의 레포트 점수를 입력하시오")
+        yourScore = Number(yourScore)
+        let yourGrade;
+        if (yourScore >= 90 && yourScore <= 100) {
+            yourGrade = "A"
+        } else if (yourScore >= 80 && yourScore < 90) {
+            yourGrade = "B"
+        } else if (yourScore >= 70 && yourScore < 80) {
+            yourGrade = "C"
+        } else if (yourScore >= 60 && yourScore < 70) {
+            yourGrade = "D"
+        } else {
+            yourGrade = "F"
+        }
+        document.getElementById("score").innerText = yourGrade
+    </script>
+</body>
+
+</html>
