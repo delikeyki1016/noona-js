@@ -19,7 +19,7 @@ userInput.addEventListener("focus", function () {
 });
 
 btnCheck.addEventListener("click", play);
-document.addEventListener("keydown", function (e) {
+userInput.addEventListener("keydown", function (e) {
     if (chance > 0 && e.key === "Enter") {
         play();
     }
