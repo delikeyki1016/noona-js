@@ -71,7 +71,6 @@ function play() {
         return;
     }
     if (chance === 0) {
-        result.innerText = "기회를 다 썼습니다. 재도전하세요!";
         result.src =
             "https://d3kxs6kpbh59hp.cloudfront.net/community/COMMUNITY/9c2c1fec149744c6a8f5eb386530eba6/ad050bc31abb431ba3f0a59c28d4ff39.jpg";
         btnCheck.disabled = true;
