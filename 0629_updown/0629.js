@@ -10,7 +10,9 @@ const result = document.querySelector("#result img"); //결과영역
 const chanceText = document.getElementById("chance"); //남은기회영역
 const hint = document.getElementById("hint"); //up down 표시영역
 const btnReset = document.getElementById("btnReset"); //재도전 버튼
-let chance = 10; // 기회
+const yourInputArea = document.getElementById("yourNum"); //사용자가 입력한 값 영역
+// 사용자가 입력한 값 넣을 변수
+let chance = 3; // 기회
 let randomNum = 0; // 랜덤값
 let userInputArr = []; // 입력한 값 배열
 
@@ -31,14 +33,16 @@ reset();
 function reset() {
     btnCheck.disabled = false;
     userInputArr = [];
-    chance = 5;
+    yourInputArea.textContent = "";
+    chance = 3;
     chanceText.innerText = chance;
     userInput.value = "";
     hint.innerText = "Up & Down";
     result.src =
         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRWf0VzLor2o0meZjZTsgWNFGcd-cx6g2qcaw&s";
     randomNum = Math.floor(Math.random() * 10) + 1; //1~10 랜덤값 뽑기
-    console.log("정답", randomNum);
+    document.getElementById("randomNum").textContent = randomNum;
+    // console.log("정답", randomNum);
 }
 
 function play() {
@@ -57,6 +61,12 @@ function play() {
     chance--;
     chanceText.innerText = chance;
     userInputArr.push(userNum);
+    let yourInputNum = "";
+    userInputArr.map((num, index) => {
+        console.log("input length", index, userInputArr.length);
+        yourInputNum += num + (index < userInputArr.length - 1 ? "," : "");
+    });
+    yourInputArea.textContent = yourInputNum;
     // 비교
     if (userNum < randomNum) {
         hint.innerHTML = `<i class="fa-solid fa-arrow-up"></i> Up`;
