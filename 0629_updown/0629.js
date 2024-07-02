@@ -67,7 +67,7 @@ function play() {
         result.src =
             "https://mblogthumb-phinf.pstatic.net/MjAxNzA3MDRfMTA2/MDAxNDk5MTIzNzA3ODcw._9JENoaDKbcC01JQ6PBWneJVBY1VntvR3YmO1Nsa_Q0g.UmjYH7SkMchjoVlqSuWDcP0Hglv3-XGSEMH_ayjM3ncg.PNG.enen202/%EC%A0%95%EB%8B%B5%EC%86%8C%EB%85%80_%EA%B9%80%EC%88%98%EC%A0%95.PNG?type=w800";
         btnCheck.disabled = true;
-        btnReset.disabled = true; // 정답일 경우 재도전을 막음
+        // btnReset.disabled = true; // 정답일 경우 재도전을 막음
         chance = 0;
         return;
     }
