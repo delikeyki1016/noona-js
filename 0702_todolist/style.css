@@ -1,7 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap");
 
 body {
-    background: url(./img/background.jpg) no-repeat 0 0;
+    background: url(./img/background.jpg) no-repeat center center;
     background-size: cover;
     color: #555;
     font-family: "Nanum Gothic", sans-serif;
@@ -18,29 +18,50 @@ body {
 .task-tabs {
     position: relative;
     display: flex;
-    gap: 20px;
-    padding: 10px;
-    border: 1px solid lightgray;
+    gap: 10px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid black;
 }
 
 #underline {
     position: absolute;
-    width: 50px;
+    min-width: 54px;
     height: 4px;
-    background-color: pink;
+    background-color: black;
     bottom: 0;
     left: 0;
+    transition: all 0.3s;
 }
 
 .task-list {
     padding-left: 0;
-    list-style-type: decimal;
+    list-style-type: none;
+    counter-reset: task-counter;
 }
 
 .task-list > li {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
+    padding: 10px 10px 10px 20px;
     border-bottom: 1px solid lightgray;
+    position: relative;
+    counter-increment: task-counter;
+}
+
+.task-list > li::before {
+    content: counter(task-counter) ". ";
+    position: absolute;
+    left: 0px;
+}
+
+.text-done {
+    text-decoration: line-through;
+    background-color: lightgray;
+}
+
+.btn-check:focus + .btn,
+.btn:focus {
+    box-shadow: none;
 }

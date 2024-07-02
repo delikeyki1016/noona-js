@@ -14,24 +14,20 @@
 <body>
     <div class="container">
         <h1 class="pt-2">Todo List</h1>
-        <section class="">
-            <div class="input-group mb-3">
-                <input type="text" id="todoInput" class="form-control" placeholder="할일을 입력하세요" />
-                <button class="btn btn-outline-secondary" type="button" id="addTodo">Add</button>
-            </div>
+        <section class="input-group mb-3">
+            <input type="text" id="todoInput" class="form-control" placeholder="할일을 입력하세요" />
+            <button class="btn btn-outline-secondary" type="button" id="addTodo">Add</button>
         </section>
 
         <section class="task-area">
             <div class="task-tabs">
                 <div id="underline"></div>
-                <div>모두</div>
-                <div>진행중</div>
-                <div>완료</div>
+                <button id="modeAll" class="btn">모두</button>
+                <button id="modeOngoing" class="btn">진행중</button>
+                <button id="modeDone" class="btn">완료</button>
             </div>
 
-            <ol class="task-list">
-
-            </ol>
+            <ol class="task-list"></ol>
 
         </section>
     </div>
