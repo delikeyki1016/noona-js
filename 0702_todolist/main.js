@@ -18,16 +18,25 @@ let todoArr = [];
 let mode = "modeAll";
 
 // 할일 추가
+// 초기 설정 Add버튼 disabled
 btnAdd.disabled = true;
+// input 창에 입력값이 있으면 Add버튼 활성화
 todoInput.addEventListener("keyup", function () {
     todoInput.value == ""
         ? (btnAdd.disabled = true)
         : (btnAdd.disabled = false);
 });
+// input 입력값이 있고 엔터키를 누르면 할일 추가
 todoInput.addEventListener("keydown", function (e) {
     e.key === "Enter" && todoInput.value !== "" && addTodo();
 });
+// 클릭 시 할일 추가
 btnAdd.addEventListener("click", addTodo);
+
+// 랜덤id 만들기
+function randomIDGenerate() {
+    return new Date().getTime();
+}
 
 function addTodo() {
     const todo = {
@@ -36,30 +45,48 @@ function addTodo() {
         isDone: false,
     };
     todoArr.push(todo);
-    console.log(todoArr);
-    render(todoArr);
+    // console.log(todoArr);
+    render();
     todoInput.value = "";
     btnAdd.disabled = true;
 }
 
-function render(arr) {
+function render() {
+    // console.log("현재모드:", mode);
+    let modeArr = [];
+    if (mode === "modeDone") {
+        for (let i = 0; i < todoArr.length; i++) {
+            if (todoArr[i].isDone) {
+                modeArr.push(todoArr[i]);
+            }
+        }
+    } else if (mode === "modeOngoing") {
+        for (let i = 0; i < todoArr.length; i++) {
+            if (!todoArr[i].isDone) {
+                modeArr.push(todoArr[i]);
+            }
+        }
+    } else {
+        modeArr = todoArr;
+    }
+    // console.log("편집된 배열", modeArr);
     let resultHTML = "";
-    for (let i = 0; i < arr.length; i++) {
+    for (let i = 0; i < modeArr.length; i++) {
         resultHTML += `
         <li>
-                    <div class="${arr[i].isDone ? "text-done" : ""}">${
-            arr[i].task
+                    <div class="${modeArr[i].isDone ? "text-done" : ""}">${
+            modeArr[i].task
         }</div>
                     <div>
                         <button class="btn btn-primary" onclick="toggleDone('${
-                            arr[i].id
+                            modeArr[i].id
                         }')">${
-            arr[i].isDone
+            modeArr[i].isDone
                 ? "<i class='fa-solid fa-rotate-right'></i>"
                 : "<i class='fa-solid fa-check'></i>"
         }</button>
                         <button class="btn btn-secondary" onclick="deleteTodo('${
-                            arr[i].id
+                            modeArr[i].id
                         }')"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </li>
@@ -69,23 +96,16 @@ function render(arr) {
 }
 
 function toggleDone(id) {
-    console.log("선택된 id", id);
-    let selectMode = "";
+    // console.log("선택된 id", id);
     for (let i = 0; i < todoArr.length; i++) {
         if (todoArr[i].id == id) {
-            console.log("상태", todoArr[i].isDone);
+            // console.log("상태", todoArr[i].isDone);
             todoArr[i].isDone = !todoArr[i].isDone;
-            selectMode = todoArr[i].isDone ? "modeDone" : "modeOngoing";
             break; // 찾으면 더이상 for를 돌지 않도록
         }
     }
     // console.log(todoArr);
-    modeChange(selectMode);
-}
-
-// 랜덤id 만들기
-function randomIDGenerate() {
-    return new Date().getTime();
+    render();
 }
 
 // 할일 삭제
@@ -97,54 +117,34 @@ function deleteTodo(id) {
             todoArr.splice(index, 1);
         }
     });
-    console.log(todoArr);
-    modeChange("modeAll");
+    // console.log(todoArr);
+    render();
 }
 
 // innerHTML: 태그 안에있는 HTML 전체 내용을 들고옴
 // textContent: 해상 노드가 가지고 있는 텍스트 값을 그대로 가져옴.
 
-// 선택된 탭 표시하기
+// 탭 클릭 이벤트
 const tabs = document.querySelectorAll(".task-tabs button");
 const bar = document.querySelector("#underline");
 tabs.forEach((button) => {
     button.addEventListener("click", function (e) {
-        // console.log(e.target.textContent);
-        modeChange(e.target.id);
+        modeChange(e);
     });
 });
 
-function modeChange(mode) {
-    // console.log("이벤트:", event);
-    // if (event) {
-    //     bar.style.width = event.target.offsetWidth + "px";
-    //     bar.style.left = event.target.offsetLeft + "px";
-    // }
+function modeChange(event) {
+    bar.style.width = event.target.offsetWidth + "px";
+    bar.style.left = event.target.offsetLeft + "px";
 
-    console.log("mode:", mode);
-    let modeArr = [];
-    if (mode === "modeOngoing") {
-        bar.style.width = "71px";
-        bar.style.left = "66px";
-
-        for (let i = 0; i < todoArr.length; i++) {
-            if (!todoArr[i].isDone) {
-                modeArr.push(todoArr[i]);
-            }
-        }
-    } else if (mode === "modeDone") {
-        bar.style.width = "56px";
-        bar.style.left = "147px";
-        for (let i = 0; i < todoArr.length; i++) {
-            if (todoArr[i].isDone) {
-                modeArr.push(todoArr[i]);
-            }
-        }
+    // console.log("클릭된 mode:", event.target.id);
+    if (event.target.id === "modeOngoing") {
+        mode = "modeOngoing";
+    } else if (event.target.id === "modeDone") {
+        mode = "modeDone";
     } else {
-        bar.style.width = "56px";
-        bar.style.left = "0";
-        modeArr = todoArr;
+        mode = "modeAll";
     }
 
-    render(modeArr);
+    render();
 }
