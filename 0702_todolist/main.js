@@ -67,6 +67,7 @@ function addTodo() {
         endDate: "",
     };
     storageIndex += 1;
+    console.log(storageIndex);
     todoObj[storageIndex] = todo;
     window.localStorage.setItem(storageIndex, JSON.stringify(todo));
     render();
@@ -173,6 +174,7 @@ function modeChange(event) {
 for (const key in window.localStorage) {
     // 현재 키가 로컬스토리지의 객체의 고유속성인지 확인
     if (window.localStorage.hasOwnProperty(key)) {
+        console.log("key확인", key, typeof key);
         const valueString = window.localStorage.getItem(key);
         // 가져온 값은 string
         // console.log("valueString", valueString, typeof valueString);
@@ -183,13 +185,18 @@ for (const key in window.localStorage) {
             // console.log("objParse", objParse);
             //할일객체에 추가
             todoObj[key] = objParse;
-            console.log(key, typeof key);
-            storageIndexArr.push(Number(key));
-            storageIndexArr.sort();
-            storageIndex = storageIndexArr[storageIndexArr.length - 1];
+            storageIndexArr.push(key);
         }
         // console.log("투두객체:", todoObj);
     }
 }
-// console.log(storageIndexArr, storageIndex);
+// 초기에 아무것도 없을때는 storageIndex를 맨위에서 선언한 대로 0으로 사용함
+// 로컬스토리지에 내용이 있을 때는 키값을 정렬시키고 가장 마지막의 키값의 값을 넘버로 변환후 storageIndex에 할당
+// 로컬스토리지에 내용이 없을때는 아래 if문을 거치는 않는다면, strogeIndex가 NaN가 된다.
+if (storageIndexArr.length > 0) {
+    storageIndexArr.sort(); // 숫자정렬 storageIndexArr.sort((a, b) => a - b)
+    console.log(storageIndexArr);
+    storageIndex = Number(storageIndexArr[storageIndexArr.length - 1]);
+}
+console.log(storageIndex);
 render();
