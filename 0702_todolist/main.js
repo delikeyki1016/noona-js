@@ -13,9 +13,10 @@ const todoInput = document.getElementById("todoInput");
 const btnAdd = document.getElementById("addTodo");
 const todoList = document.querySelector(".task-list");
 
-// 변수 선언
+// 초기 변수 선언
 let todoObj = {};
 let mode = "modeAll";
+let storageIndexArr = [];
 let storageIndex = 0;
 
 // 할일 추가
@@ -65,9 +66,9 @@ function addTodo() {
         createDate: formatDateTime(),
         endDate: "",
     };
+    storageIndex += 1;
     todoObj[storageIndex] = todo;
     window.localStorage.setItem(storageIndex, JSON.stringify(todo));
-    storageIndex += 1;
     render();
     todoInput.value = "";
     btnAdd.disabled = true;
@@ -182,8 +183,13 @@ for (const key in window.localStorage) {
             // console.log("objParse", objParse);
             //할일객체에 추가
             todoObj[key] = objParse;
+            console.log(key, typeof key);
+            storageIndexArr.push(Number(key));
+            storageIndexArr.sort();
+            storageIndex = storageIndexArr[storageIndexArr.length - 1];
         }
         // console.log("투두객체:", todoObj);
     }
 }
+// console.log(storageIndexArr, storageIndex);
 render();
