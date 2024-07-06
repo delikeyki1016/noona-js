@@ -47,6 +47,7 @@ body {
     padding: 10px 10px 10px 20px;
     border-bottom: 1px solid lightgray;
     position: relative;
+    gap: 5px;
     counter-increment: task-counter;
 }
 
@@ -57,11 +58,33 @@ body {
 }
 
 .text-done {
-    text-decoration: line-through;
     background-color: lightgray;
 }
 
 .btn-check:focus + .btn,
 .btn:focus {
     box-shadow: none;
+}
+
+.text-dodo {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+}
+
+.text-date {
+    font-size: 12px;
+    font-weight: 400;
+}
+
+.text-done > .text-task {
+    text-decoration: line-through;
+}
+
+@media (max-width: 576px) {
+    .task-list > li {
+        align-items: flex-start;
+    }
 }

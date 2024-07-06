@@ -14,8 +14,9 @@ const btnAdd = document.getElementById("addTodo");
 const todoList = document.querySelector(".task-list");
 
 // 변수 선언
-let todoArr = [];
+let todoObj = {};
 let mode = "modeAll";
+let storageIndex = 0;
 
 // 할일 추가
 // 초기 설정 Add버튼 disabled
@@ -38,14 +39,35 @@ function randomIDGenerate() {
     return new Date().getTime();
 }
 
+// 할일 생성 날짜 구하기
+function formatDateTime() {
+    const d = new Date();
+    return (
+        d.getFullYear() +
+        "-" +
+        (d.getMonth() + 1).toString().padStart(2, "0") +
+        "-" +
+        d.getDate().toString().padStart(2, "0") +
+        " " +
+        d.getHours().toString().padStart(2, "0") +
+        ":" +
+        d.getMinutes().toString().padStart(2, "0") +
+        ":" +
+        d.getSeconds().toString().padStart(2, "0")
+    );
+}
+
 function addTodo() {
     const todo = {
         id: randomIDGenerate(),
         task: todoInput.value,
         isDone: false,
+        createDate: formatDateTime(),
+        endDate: "",
     };
-    todoArr.push(todo);
-    // console.log(todoArr);
+    todoObj[storageIndex] = todo;
+    window.localStorage.setItem(storageIndex, JSON.stringify(todo));
+    storageIndex += 1;
     render();
     todoInput.value = "";
     btnAdd.disabled = true;
@@ -53,41 +75,47 @@ function addTodo() {
 
 function render() {
     // console.log("현재모드:", mode);
-    let modeArr = [];
+    // console.log("현재객체", todoObj);
+    let modeObj = {};
     if (mode === "modeDone") {
-        for (let i = 0; i < todoArr.length; i++) {
-            if (todoArr[i].isDone) {
-                modeArr.push(todoArr[i]);
+        for (const key in todoObj) {
+            if (todoObj[key].isDone) {
+                modeObj[key] = todoObj[key];
             }
         }
     } else if (mode === "modeOngoing") {
-        for (let i = 0; i < todoArr.length; i++) {
-            if (!todoArr[i].isDone) {
-                modeArr.push(todoArr[i]);
+        for (const key in todoObj) {
+            if (!todoObj[key].isDone) {
+                modeObj[key] = todoObj[key];
             }
         }
     } else {
-        modeArr = todoArr;
+        modeObj = todoObj;
     }
-    // console.log("편집된 배열", modeArr);
+    // console.log("편집된객체", modeObj);
+
     let resultHTML = "";
-    for (let i = 0; i < modeArr.length; i++) {
+    for (const key in modeObj) {
         resultHTML += `
         <li>
-                    <div class="${modeArr[i].isDone ? "text-done" : ""}">${
-            modeArr[i].task
-        }</div>
+                    <div class="text-dodo ${
+                        modeObj[key].isDone ? "text-done" : ""
+                    }">
+                        <span class="text-task">${modeObj[key].task}</span>
+                        <span class="text-date">(생성일: ${
+                            modeObj[key].createDate
+                        } ${
+            modeObj[key].isDone ? `/ 완료일: ${modeObj[key].endDate}` : ""
+        })</span>
+                    </div>
                     <div>
-                        <button class="btn btn-primary" onclick="toggleDone('${
-                            modeArr[i].id
-                        }')">${
-            modeArr[i].isDone
-                ? "<i class='fa-solid fa-rotate-right'></i>"
-                : "<i class='fa-solid fa-check'></i>"
-        }</button>
-                        <button class="btn btn-secondary" onclick="deleteTodo('${
-                            modeArr[i].id
-                        }')"><i class="fa-solid fa-trash-can"></i></button>
+                        <button class="btn btn-primary" onclick="toggleDone('${key}')">
+                        ${
+                            modeObj[key].isDone
+                                ? "<i class='fa-solid fa-rotate-right'></i>"
+                                : "<i class='fa-solid fa-check'></i>"
+                        }</button>
+                        <button class="btn btn-secondary" onclick="deleteTodo('${key}')"><i class="fa-solid fa-trash-can"></i></button>
                     </div>
                 </li>
         `;
@@ -95,34 +123,25 @@ function render() {
     todoList.innerHTML = resultHTML;
 }
 
-function toggleDone(id) {
-    // console.log("선택된 id", id);
-    for (let i = 0; i < todoArr.length; i++) {
-        if (todoArr[i].id == id) {
-            // console.log("상태", todoArr[i].isDone);
-            todoArr[i].isDone = !todoArr[i].isDone;
-            break; // 찾으면 더이상 for를 돌지 않도록
-        }
-    }
-    // console.log(todoArr);
+function toggleDone(getKey) {
+    todoObj[getKey].isDone = !todoObj[getKey].isDone;
+    // console.log("토글된객체", todoObj[getKey]);
+    todoObj[getKey].endDate = formatDateTime();
+    const getTodo = JSON.parse(window.localStorage.getItem(getKey));
+    getTodo.isDone = todoObj[getKey].isDone;
+    getTodo.endDate = todoObj[getKey].endDate;
+    window.localStorage.setItem(getKey, JSON.stringify(getTodo));
     render();
 }
 
 // 할일 삭제
-function deleteTodo(id) {
-    // console.log(id);
-    todoArr.map((item, index) => {
-        if (item.id == id) {
-            // console.log(item);
-            todoArr.splice(index, 1);
-        }
-    });
-    // console.log(todoArr);
+function deleteTodo(getKey) {
+    // console.log("기존객체", todoObj);
+    delete todoObj[getKey];
+    // console.log("삭제된객체", todoObj);
+    window.localStorage.removeItem(getKey);
     render();
 }
-
-// innerHTML: 태그 안에있는 HTML 전체 내용을 들고옴
-// textContent: 해상 노드가 가지고 있는 텍스트 값을 그대로 가져옴.
 
 // 탭 클릭 이벤트
 const tabs = document.querySelectorAll(".task-tabs button");
@@ -148,3 +167,23 @@ function modeChange(event) {
 
     render();
 }
+
+// 1. 첫 로딩 시, 로컬스토리지에 값을 가져와 그려줌
+for (const key in window.localStorage) {
+    // 현재 키가 로컬스토리지의 객체의 고유속성인지 확인
+    if (window.localStorage.hasOwnProperty(key)) {
+        const valueString = window.localStorage.getItem(key);
+        // 가져온 값은 string
+        // console.log("valueString", valueString, typeof valueString);
+        // 가져온 값이 JSON문자열인지 확인
+        if (valueString && valueString[0] === "{") {
+            // json객체로 변환
+            const objParse = JSON.parse(valueString);
+            // console.log("objParse", objParse);
+            //할일객체에 추가
+            todoObj[key] = objParse;
+        }
+        // console.log("투두객체:", todoObj);
+    }
+}
+render();
