@@ -17,7 +17,7 @@ let news = [];
 
 const getNews = async () => {
     const url = new URL(
-        `https://beautiful-torte-d702c9.netlify.app/v2/top-headlines?country=kr&apiKey=${API_KEY}`
+        `https://beautiful-torte-d702c9.netlify.app/top-headlines?country=kr&apiKey=${API_KEY}`
     );
     console.log("url:", url);
 
