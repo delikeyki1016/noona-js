@@ -1,0 +1,40 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+ul,
+ol {
+    margin: 0;
+    list-style: none;
+}
+
+@media (max-width: 576px) {
+    html {
+        font-size: 14px;
+    }
+    header > svg {
+        width: 100%;
+    }
+}
+
+.list-category {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    padding: 10px;
+}
+
+.list-category > li {
+    font-size: 18px;
+}
+
+.photo-size {
+    max-width: 100%;
+    min-width: 100%;
+    max-height: 250px;
+    font-size: 250px;
+    color: lightgray;
+    text-align: center;
+}
