@@ -16,6 +16,8 @@ const API_KEY = `70a9dc1efaba49299c95e70ba34ae4ab`;
 
 let newsList = [];
 let category = "";
+const defaultImage =
+    "https://static-00.iconduck.com/assets.00/no-image-icon-2048x2048-2t5cx953.png";
 
 const getNews = async () => {
     const url = new URL(
@@ -51,8 +53,8 @@ const render = () => {
                 <div class="col-lg-4">
                 ${
                     item.urlToImage && item.urlToImage
-                        ? `<img src=${item.urlToImage} alt="" class="photo-size"  />`
-                        : `<i class="fa-regular fa-image photo-size"></i>`
+                        ? `<img src=${item.urlToImage} alt="" class="photo-size" onerror="this.onerror=null;this.src='${defaultImage}';" />`
+                        : `<img src=${defaultImage} alt="" class="photo-size" />`
                 }
                 </div>
                 <div class="col-lg-8 d-flex flex-column">
