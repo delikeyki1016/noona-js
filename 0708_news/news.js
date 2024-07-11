@@ -13,20 +13,76 @@
 // 누나 API : https://beautiful-torte-d702c9.netlify.app/top-headlines?country=kr&apiKey=
 // https://newsapi.org/v2/top-headlines?country=kr&apiKey=70a9dc1efaba49299c95e70ba34ae4ab&pageSize=1
 const API_KEY = `70a9dc1efaba49299c95e70ba34ae4ab`;
+const noonaURL = `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines`;
 
 let newsList = [];
 let category = "";
 const defaultImage =
     "https://static-00.iconduck.com/assets.00/no-image-icon-2048x2048-2t5cx953.png";
 
+// 키워드 검색
+let keyword = "";
+const iptKeyword = document.getElementById("inputKeyword");
+const btnSearch = document.getElementById("buttonSearch");
+btnSearch.addEventListener("click", () => {
+    if (iptKeyword.value === "") {
+        alert("키워드를 입력하세요!");
+    } else {
+        keyword = iptKeyword.value;
+        console.log("키워드:", keyword);
+        getNews();
+    }
+});
+iptKeyword.addEventListener("keydown", function (e) {
+    e.preventDefault();
+    if (e.key === "Enter" && iptKeyword.value !== "") {
+        keyword = iptKeyword.value;
+        console.log("키워드:", keyword);
+        getNews();
+    }
+});
+iptKeyword.addEventListener("focus", () => {
+    iptKeyword.value = "";
+});
+
+// 카테고리별 뉴스 검색
+const categoryAll = document.querySelectorAll(".list-category > li > a"); //노드리스트임
+console.log("카테고리", categoryAll);
+const categoryArr = Array.from(categoryAll); // map함수를 사용하기 위해 배열로 변환 ==> forEach로 사용할것이므로 필요없음
+console.log("카테고리 배열", categoryArr);
+
+categoryAll.forEach((cate) => {
+    cate.addEventListener("click", (event) => {
+        category = event.target.textContent;
+        console.log("변경된 카테고리", category);
+        if (isBrowserWidthBelow(maxScreenWidth)) {
+            // 모바일에서는 카테고리 클릭 시 카테고리영역 닫기
+            navBar.style.display = "none";
+            document.querySelector("html").style.overflow = "auto";
+        }
+        getNews();
+    });
+});
+
+// 로고를 누르면 첫로딩때 처럼 topheadline으로 랜더링되기
+const btnHome = document.getElementById("btn-home");
+btnHome.addEventListener("click", function () {
+    getNews();
+});
+
+// 뉴스 API 호출
 const getNews = async () => {
-    const url = new URL(
-        `${
-            category && category !== ""
-                ? `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}`
-                : `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr`
-        } `
-    );
+    iptKeyword.blur();
+    let makeUrl = ``;
+    if (category && category !== "") {
+        makeUrl = `${noonaURL}?category=${category}`;
+    } else if (keyword && keyword !== "") {
+        makeUrl = `${noonaURL}?q=${keyword}`;
+    } else {
+        makeUrl = `${noonaURL}?country=kr`;
+    }
+    console.log("makeUrl:", makeUrl);
+    const url = new URL(makeUrl);
     console.log("url:", url);
 
     const response = await fetch(url);
@@ -34,16 +90,25 @@ const getNews = async () => {
     const data = await response.json(); // json파일형태로 data변수에 선언
     console.log("data:", data);
     newsList = [];
-    console.log("다시배열내용", newsList);
-    if (Array.isArray(data.sources)) {
-        newsList = data.sources;
-    } else if (data.articles) {
-        newsList = data.articles;
-    }
+    // console.log("다시배열내용", newsList);
+    // if (Array.isArray(data.sources)) {
+    //     newsList = data.sources;
+    // } else if (data.articles) {
+    //     newsList = data.articles;
+    // }
+    newsList = data.articles;
     console.log("newsList:", newsList);
-    render();
+    if (newsList.length === 0) {
+        document.getElementById("newsBoard").innerHTML =
+            "<div class='text-center p-3'>뉴스 결과 없음</div>";
+    } else {
+        render();
+    }
+    category = "";
+    keyword = "";
 };
 
+// 뉴스 그리기
 const render = () => {
     let newsHTML = ``;
 
@@ -76,8 +141,6 @@ const render = () => {
     document.getElementById("newsBoard").innerHTML = newsHTML;
 };
 
-getNews();
-
 // UI
 const searchForm = document.getElementById("searchBox");
 const showInputBox = () => {
@@ -102,12 +165,6 @@ function truncateText(text) {
     return text.length > 101 ? text.substring(0, 100) + "..." : text;
 }
 
-// 카테고리별 뉴스 검색
-const categoryAll = document.querySelectorAll(".list-category > li > a"); //노드리스트임
-console.log("카테고리", categoryAll);
-const categoryArr = Array.from(categoryAll); // map함수를 사용하기 위해 배열로 변환 ==> forEach로 사용할것이므로 필요없음
-console.log("카테고리 배열", categoryArr);
-
 // 모바일에서 카테고리를 클릭하면 해당 레이어가 닫히게 처리
 let maxScreenWidth = 576; //체크할 최대 가로 사이즈
 function isBrowserWidthBelow(maxWidth) {
@@ -115,22 +172,5 @@ function isBrowserWidthBelow(maxWidth) {
     return currentWidth <= maxWidth; //기준사이즈보다 작거나같으면 true 반환
 }
 
-categoryAll.forEach((cate) => {
-    cate.addEventListener("click", (event) => {
-        category = event.target.textContent;
-        console.log("변경된 카테고리", category);
-        if (isBrowserWidthBelow(maxScreenWidth)) {
-            // 모바일에서는 카테고리 클릭 시 카테고리영역 닫기
-            navBar.style.display = "none";
-            document.querySelector("html").style.overflow = "auto";
-        }
-        getNews();
-    });
-});
-
-// 로고를 누르면 첫로딩때 처럼 topheadline으로 랜더링되기
-const btnHome = document.getElementById("btn-home");
-btnHome.addEventListener("click", function () {
-    category = "";
-    getNews();
-});
+// 첫 로딩 시 그리기
+getNews();
