@@ -21,8 +21,8 @@ const getNews = async () => {
     const url = new URL(
         `${
             category && category !== ""
-                ? `https://newsapi.org/v2/top-headlines/sources?category=${category}&apiKey=${API_KEY}`
-                : `https://newsapi.org/v2/top-headlines?country=kr&apiKey=${API_KEY}`
+                ? `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr&category=${category}`
+                : `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines?country=kr`
         } `
     );
     console.log("url:", url);
@@ -47,8 +47,7 @@ const render = () => {
 
     newsHTML = newsList
         .map((item) => {
-            if (!item.id) {
-                return `<div class="row p-2 border-bottom">
+            return `<div class="row p-2 border-bottom">
                 <div class="col-lg-4">
                 ${
                     item.urlToImage && item.urlToImage
@@ -57,7 +56,7 @@ const render = () => {
                 }
                 </div>
                 <div class="col-lg-8 d-flex flex-column">
-                    <h2>${item.title}</h2>
+                    <h2><a href=${item.url} target="_new">${item.title}</a></h2>
                     <p>${
                         item.description === null || item.description === ""
                             ? "내용없음"
@@ -69,22 +68,6 @@ const render = () => {
                     ${moment(item.publishedAt).startOf("hour").fromNow()}</div>
                 </div>
             </div>`;
-            } else {
-                return `<div class="row p-2 border-bottom">
-                <div class="col-lg-12 d-flex flex-column">
-                    <h2>${item.name}</h2>
-                    <p>${
-                        item.description === null || item.description === ""
-                            ? "내용없음"
-                            : truncateText(item.description)
-                    }</p>
-                    <div class="mt-auto">${
-                        item.id === null ? "no source" : item.id
-                    } | 
-                    ${item.url === null ? "no url" : item.url}</div>
-                </div>
-            </div>`;
-            }
         })
         .join("");
     // console.log("newsHTML", newsHTML); // newsList는 배열이기 때문에 ','까지 출력이 된다. join()을 사용하여 배열을 string타입으로 변환하여 ''을 넣어 ,를 삭제하자
@@ -120,7 +103,7 @@ function truncateText(text) {
 // 카테고리별 뉴스 검색
 const categoryAll = document.querySelectorAll(".list-category > li > a"); //노드리스트임
 console.log("카테고리", categoryAll);
-const categoryArr = Array.from(categoryAll); // map함수를 사용하기 위해 배열로 변환
+const categoryArr = Array.from(categoryAll); // map함수를 사용하기 위해 배열로 변환 ==> forEach로 사용할것이므로 필요없음
 console.log("카테고리 배열", categoryArr);
 
 // 모바일에서 카테고리를 클릭하면 해당 레이어가 닫히게 처리
@@ -130,7 +113,7 @@ function isBrowserWidthBelow(maxWidth) {
     return currentWidth <= maxWidth; //기준사이즈보다 작거나같으면 true 반환
 }
 
-categoryArr.map((cate) => {
+categoryAll.forEach((cate) => {
     cate.addEventListener("click", (event) => {
         category = event.target.textContent;
         console.log("변경된 카테고리", category);
