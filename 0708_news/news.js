@@ -35,10 +35,14 @@ btnSearch.addEventListener("click", () => {
 });
 btnSearch.addEventListener("keydown", function (e) {
     e.preventDefault();
-    if (e.key === "Enter" && iptKeyword.value !== "") {
-        keyword = iptKeyword.value;
-        console.log("키워드:", keyword);
-        getNews();
+    if (e.key === "Enter") {
+        if (iptKeyword.value === "") {
+            alert("키워드를 입력하세요!");
+        } else {
+            keyword = iptKeyword.value;
+            console.log("키워드:", keyword);
+            getNews();
+        }
     }
 });
 iptKeyword.addEventListener("focus", () => {
