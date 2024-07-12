@@ -33,7 +33,7 @@ btnSearch.addEventListener("click", () => {
         getNews();
     }
 });
-iptKeyword.addEventListener("keydown", function (e) {
+btnSearch.addEventListener("keydown", function (e) {
     e.preventDefault();
     if (e.key === "Enter" && iptKeyword.value !== "") {
         keyword = iptKeyword.value;
@@ -43,6 +43,12 @@ iptKeyword.addEventListener("keydown", function (e) {
 });
 iptKeyword.addEventListener("focus", () => {
     iptKeyword.value = "";
+});
+iptKeyword.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+        console.log("엔터를 누르면 동작하지 않게");
+    }
 });
 
 // 카테고리별 뉴스 검색
