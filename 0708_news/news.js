@@ -20,69 +20,8 @@ let category = "";
 const defaultImage =
     "https://static-00.iconduck.com/assets.00/no-image-icon-2048x2048-2t5cx953.png";
 
-// 키워드 검색
-let keyword = "";
-const iptKeyword = document.getElementById("inputKeyword");
-const btnSearch = document.getElementById("buttonSearch");
-btnSearch.addEventListener("click", () => {
-    if (iptKeyword.value === "") {
-        alert("키워드를 입력하세요!");
-    } else {
-        keyword = iptKeyword.value;
-        console.log("키워드:", keyword);
-        getNews();
-    }
-});
-btnSearch.addEventListener("keydown", function (e) {
-    e.preventDefault();
-    if (e.key === "Enter") {
-        if (iptKeyword.value === "") {
-            alert("키워드를 입력하세요!");
-        } else {
-            keyword = iptKeyword.value;
-            console.log("키워드:", keyword);
-            getNews();
-        }
-    }
-});
-iptKeyword.addEventListener("focus", () => {
-    iptKeyword.value = "";
-});
-iptKeyword.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-        e.preventDefault();
-        console.log("엔터를 누르면 동작하지 않게");
-    }
-});
-
-// 카테고리별 뉴스 검색
-const categoryAll = document.querySelectorAll(".list-category > li > a"); //노드리스트임
-console.log("카테고리", categoryAll);
-const categoryArr = Array.from(categoryAll); // map함수를 사용하기 위해 배열로 변환 ==> forEach로 사용할것이므로 필요없음
-console.log("카테고리 배열", categoryArr);
-
-categoryAll.forEach((cate) => {
-    cate.addEventListener("click", (event) => {
-        category = event.target.textContent;
-        console.log("변경된 카테고리", category);
-        if (isBrowserWidthBelow(maxScreenWidth)) {
-            // 모바일에서는 카테고리 클릭 시 카테고리영역 닫기
-            navBar.style.display = "none";
-            document.querySelector("html").style.overflow = "auto";
-        }
-        getNews();
-    });
-});
-
-// 로고를 누르면 첫로딩때 처럼 topheadline으로 랜더링되기
-const btnHome = document.getElementById("btn-home");
-btnHome.addEventListener("click", function () {
-    getNews();
-});
-
 // 뉴스 API 호출
 const getNews = async () => {
-    iptKeyword.blur();
     let makeUrl = ``;
     if (category && category !== "") {
         makeUrl = `${noonaURL}?category=${category}`;
@@ -91,31 +30,33 @@ const getNews = async () => {
     } else {
         makeUrl = `${noonaURL}?country=kr`;
     }
-    console.log("makeUrl:", makeUrl);
     const url = new URL(makeUrl);
-    console.log("url:", url);
 
-    const response = await fetch(url);
-    console.log("rsponse:", response);
-    const data = await response.json(); // json파일형태로 data변수에 선언
-    console.log("data:", data);
-    newsList = [];
-    // console.log("다시배열내용", newsList);
-    // if (Array.isArray(data.sources)) {
-    //     newsList = data.sources;
-    // } else if (data.articles) {
-    //     newsList = data.articles;
-    // }
-    newsList = data.articles;
-    console.log("newsList:", newsList);
-    if (newsList.length === 0) {
-        document.getElementById("newsBoard").innerHTML =
-            "<div class='text-center p-3'>뉴스 결과 없음</div>";
-    } else {
-        render();
+    try {
+        const response = await fetch(url);
+        const data = await response.json(); // json파일형태로 data변수에 선언
+        if (response.status === 200) {
+            newsList = data.articles;
+            if (newsList.length === 0) {
+                // document.getElementById("newsBoard").innerHTML =
+                //     "<div class='text-center p-3'>뉴스 결과 없음</div>";
+                throw new Error("검색결과가 없습니다.");
+            } else {
+                render();
+            }
+            category = "";
+            keyword = "";
+        } else {
+            throw new Error(response.statusText);
+        }
+    } catch (error) {
+        errorRender(error.message);
     }
-    category = "";
-    keyword = "";
+};
+
+const errorRender = (errMsg) => {
+    const errorHTML = `<div class="alert alert-danger text-center" role="alert">${errMsg}</div>`;
+    document.getElementById("newsBoard").innerHTML = errorHTML;
 };
 
 // 뉴스 그리기
@@ -150,6 +91,63 @@ const render = () => {
     // console.log("newsHTML", newsHTML); // newsList는 배열이기 때문에 ','까지 출력이 된다. join()을 사용하여 배열을 string타입으로 변환하여 ''을 넣어 ,를 삭제하자
     document.getElementById("newsBoard").innerHTML = newsHTML;
 };
+
+// 키워드 검색
+let keyword = "";
+const iptKeyword = document.getElementById("inputKeyword");
+const btnSearch = document.getElementById("buttonSearch");
+btnSearch.addEventListener("click", () => {
+    if (iptKeyword.value === "") {
+        alert("키워드를 입력하세요!");
+    } else {
+        keyword = iptKeyword.value;
+        getNews();
+    }
+});
+btnSearch.addEventListener("keydown", function (e) {
+    e.preventDefault();
+    if (e.key === "Enter") {
+        if (iptKeyword.value === "") {
+            alert("키워드를 입력하세요!");
+        } else {
+            keyword = iptKeyword.value;
+            getNews();
+        }
+    }
+});
+iptKeyword.addEventListener("focus", () => {
+    iptKeyword.value = "";
+});
+iptKeyword.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();
+    }
+});
+
+// 카테고리별 뉴스 검색
+const categoryAll = document.querySelectorAll(".list-category > li > a"); //노드리스트임
+// const categoryArr = Array.from(categoryAll); // map함수를 사용하기 위해 배열로 변환 ==> forEach로 사용할것이므로 필요없음
+// console.log("카테고리 배열", categoryArr);
+
+categoryAll.forEach((cate) => {
+    cate.addEventListener("click", (event) => {
+        category = event.target.textContent;
+        console.log("변경된 카테고리", category);
+        if (isBrowserWidthBelow(maxScreenWidth)) {
+            // 모바일에서는 카테고리 클릭 시 카테고리영역 닫기
+            navBar.style.display = "none";
+            document.querySelector("html").style.overflow = "auto";
+        }
+        getNews();
+    });
+});
+
+// 로고를 누르면 첫로딩때 처럼 topheadline으로 랜더링되기
+// 질문: try catch문에서 검색결과 없음을 반환한 후에는 동작하지 않는 이유는 뭘까요? ㅠㅠ
+const btnHome = document.getElementById("btn-home");
+btnHome.addEventListener("click", function () {
+    getNews();
+});
 
 // UI
 const searchForm = document.getElementById("searchBox");
