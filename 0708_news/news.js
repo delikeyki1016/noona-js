@@ -12,7 +12,7 @@
 
 // 누나 API : https://beautiful-torte-d702c9.netlify.app/top-headlines?country=kr&apiKey=
 // https://newsapi.org/v2/top-headlines?country=kr&apiKey=70a9dc1efaba49299c95e70ba34ae4ab&pageSize=1
-const API_KEY = `70a9dc1efaba49299c95e70ba34ae4ab`;
+// const API_KEY = `70a9dc1efaba49299c95e70ba34ae4ab`;
 const noonaURL = `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines`;
 
 let newsList = [];
