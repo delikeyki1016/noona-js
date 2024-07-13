@@ -200,6 +200,7 @@ btnSearch.addEventListener("click", () => {
         alert("키워드를 입력하세요!");
     } else {
         keyword = iptKeyword.value;
+        currentPageGroup = 1;
         getNews(1);
     }
 });
@@ -211,6 +212,7 @@ btnSearch.addEventListener("keydown", function (e) {
             alert("키워드를 입력하세요!");
         } else {
             keyword = iptKeyword.value;
+            currentPageGroup = 1;
             getNews(1);
         }
     }
@@ -232,6 +234,7 @@ const categoryAll = document.querySelectorAll(".list-category > li > a"); //노�
 categoryAll.forEach((cate) => {
     cate.addEventListener("click", (event) => {
         keyword = "";
+        currentPageGroup = 1;
         category = event.target.textContent;
         console.log("변경된 카테고리", category);
         if (isBrowserWidthBelow(maxScreenWidth)) {
@@ -248,6 +251,7 @@ const btnHome = document.getElementById("btn-home");
 btnHome.addEventListener("click", function () {
     category = "";
     keyword = "";
+    currentPageGroup = 1;
     getNews(1);
 });
 
