@@ -20,32 +20,53 @@ let category = "";
 const defaultImage =
     "https://static-00.iconduck.com/assets.00/no-image-icon-2048x2048-2t5cx953.png";
 
+let totalArticles = 0; // 전체 기사수
+let pageSize = 10; // 한페이지에 보여줄 페이지수
+let totalPage = 0; // 총 페이지 수 : Math.ceil(totalArticles/pageSize)
+let pageNum = 1; // 현재 페이지넘버
+let pagePerGroup = 5; // 한페이지에 보여줄 페이지그룹 수
+let pageGroup = 0; //총 페이지 그룹 : Math.ceil(totalPage / pagePerGroup)
+let currentPageGroup = 1; // 현재 페이지 그룹 : Math.ceil(pageNum / pagePerGroup)
+
 // 뉴스 API 호출
-const getNews = async () => {
+const getNews = async (getPageNum) => {
+    console.log("넘겨받은페이지번호", getPageNum);
+    pageNum = getPageNum;
+    console.log("현재페이지넘버1", pageNum);
     let makeUrl = ``;
     if (category && category !== "") {
-        makeUrl = `${noonaURL}?category=${category}`;
+        makeUrl = `${noonaURL}?category=${category}&pageSize=${
+            pageNum * pageSize
+        }`;
     } else if (keyword && keyword !== "") {
-        makeUrl = `${noonaURL}?q=${keyword}`;
+        makeUrl = `${noonaURL}?q=${keyword}&pageSize=${pageNum * pageSize}`;
     } else {
-        makeUrl = `${noonaURL}?country=kr`;
+        makeUrl = `${noonaURL}?country=kr?&pageSize=${pageNum * pageSize}`;
     }
     const url = new URL(makeUrl);
-
+    console.log("url", url);
     try {
+        // url뒤에 쿼리들을 아래처럼 붙여줄 수 있다.
+        // url.searchParams.set("page", page); // &page=page
+        // url.searchParams.set("pageSize", pageSize); //&pageSize=pageSize
         const response = await fetch(url);
         const data = await response.json(); // json파일형태로 data변수에 선언
+        console.log("data", data);
         if (response.status === 200) {
             newsList = data.articles;
+            newsList.splice(0, (pageNum - 1) * pageSize);
+            console.log("잘라낸리스트", newsList);
             if (newsList.length === 0) {
                 // document.getElementById("newsBoard").innerHTML =
                 //     "<div class='text-center p-3'>뉴스 결과 없음</div>";
-                throw new Error("검색결과가 없습니다.");
-            } else {
-                render();
+                throw new Error("검색결과가 없습니다."); // 여기로 들어오면 catch로 넘어감
             }
-            category = "";
-            keyword = "";
+            totalArticles = data.totalResults;
+            totalPage = Math.ceil(totalArticles / pageSize);
+            pageGroup = Math.ceil(totalPage / pagePerGroup);
+            console.log(totalArticles, totalPage, pageGroup);
+            render();
+            pageRender();
         } else {
             throw new Error(response.statusText);
         }
@@ -92,26 +113,105 @@ const render = () => {
     document.getElementById("newsBoard").innerHTML = newsHTML;
 };
 
+// pagination
+const pageRender = () => {
+    // console.log("현재페이지넘버2", pageNum);
+    let pageItems = "";
+    let endPage =
+        pagePerGroup > totalPage ? totalPage : currentPageGroup * pagePerGroup;
+    for (
+        let i = currentPageGroup * pagePerGroup - (pagePerGroup - 1);
+        i <= endPage;
+        i++
+    ) {
+        pageItems += `<li class="page-item"><a class="page-link ${
+            pageNum === i ? "active" : ""
+        }" href="#N" onclick="getNews(${i})">${i}</a></li>`;
+    }
+    const pageHTML = `
+    ${
+        currentPageGroup > 1
+            ? `<li class="page-item">
+                        <a class="page-link" href="#N" aria-label="Previous page group" onclick="minusGroup()">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>`
+            : ""
+    }
+    ${
+        pageNum > currentPageGroup * pagePerGroup - (pagePerGroup - 1)
+            ? `<li class="page-item">
+                        <a class="page-link" href="#N" aria-label="Previous" onclick="getNews(${
+                            pageNum - 1
+                        })">
+                            <span aria-hidden="true">&lt;</span>
+                        </a>
+                    </li>`
+            : ""
+    }
+                    
+                    ${pageItems}
+                    ${
+                        pageNum < currentPageGroup * pagePerGroup &&
+                        pageNum < totalPage
+                            ? `<li class="page-item">
+                        <a class="page-link" href="#N" aria-label="Next" onclick="getNews(${
+                            pageNum + 1
+                        })">
+                            <span aria-hidden="true">&gt;</span>
+                        </a>
+                    </li>`
+                            : ""
+                    }
+                    ${
+                        currentPageGroup === pageGroup
+                            ? ""
+                            : `<li class="page-item">
+                        <a class="page-link" href="#N" aria-label="Next page Group" onclick="plusGroup()
+                        ">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>`
+                    }
+                    
+    `;
+    document.querySelector(".pagination").innerHTML = pageHTML;
+};
+
+const plusGroup = () => {
+    currentPageGroup++;
+    pageNum = currentPageGroup * pagePerGroup - (pagePerGroup - 1);
+    getNews(pageNum);
+};
+
+const minusGroup = () => {
+    currentPageGroup--;
+    pageNum = currentPageGroup * pagePerGroup - (pagePerGroup - 1);
+    getNews(pageNum);
+};
+
 // 키워드 검색
 let keyword = "";
 const iptKeyword = document.getElementById("inputKeyword");
 const btnSearch = document.getElementById("buttonSearch");
 btnSearch.addEventListener("click", () => {
+    category = "";
     if (iptKeyword.value === "") {
         alert("키워드를 입력하세요!");
     } else {
         keyword = iptKeyword.value;
-        getNews();
+        getNews(1);
     }
 });
 btnSearch.addEventListener("keydown", function (e) {
+    category = "";
     e.preventDefault();
     if (e.key === "Enter") {
         if (iptKeyword.value === "") {
             alert("키워드를 입력하세요!");
         } else {
             keyword = iptKeyword.value;
-            getNews();
+            getNews(1);
         }
     }
 });
@@ -131,6 +231,7 @@ const categoryAll = document.querySelectorAll(".list-category > li > a"); //노�
 
 categoryAll.forEach((cate) => {
     cate.addEventListener("click", (event) => {
+        keyword = "";
         category = event.target.textContent;
         console.log("변경된 카테고리", category);
         if (isBrowserWidthBelow(maxScreenWidth)) {
@@ -138,15 +239,16 @@ categoryAll.forEach((cate) => {
             navBar.style.display = "none";
             document.querySelector("html").style.overflow = "auto";
         }
-        getNews();
+        getNews(1);
     });
 });
 
 // 로고를 누르면 첫로딩때 처럼 topheadline으로 랜더링되기
-// 질문: try catch문에서 검색결과 없음을 반환한 후에는 동작하지 않는 이유는 뭘까요? ㅠㅠ
 const btnHome = document.getElementById("btn-home");
 btnHome.addEventListener("click", function () {
-    getNews();
+    category = "";
+    keyword = "";
+    getNews(1);
 });
 
 // UI
@@ -181,4 +283,4 @@ function isBrowserWidthBelow(maxWidth) {
 }
 
 // 첫 로딩 시 그리기
-getNews();
+getNews(1);
