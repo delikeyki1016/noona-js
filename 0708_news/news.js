@@ -1,14 +1,5 @@
-// setTimeout(()=>console.log("1"), 5000) 를 실행한다면
-// 자바스크립트는 알바생이 한명 ==> 싱글 스레드
-// 브라우저 알바생 : Web API(Ajax, fetch, setTimeout, eventhandler) <= 자바스크립트의 비동기처리는 여기로 보냄
-// setTimeout의 5초를 기다린후
-// Task Queue로 보냄 (FIFO)
-// Call Stack이 비워지면 Task Queue가 console.log("1")를 Stack으로 보냄
-
-// pending : 보류중
-
 // 누나 API : https://beautiful-torte-d702c9.netlify.app/top-headlines?country=kr&apiKey=
-// https://newsapi.org/v2/top-headlines?country=kr&apiKey=70a9dc1efaba49299c95e70ba34ae4ab&pageSize=1
+// https://newsapi.org/v2/top-headlines?country=kr&apiKey=70a9dc1efaba49299c95e70ba34ae4ab
 // const API_KEY = `70a9dc1efaba49299c95e70ba34ae4ab`;
 const noonaURL = `https://noona-times-be-5ca9402f90d9.herokuapp.com/top-headlines`;
 
