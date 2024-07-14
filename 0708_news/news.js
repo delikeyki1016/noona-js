@@ -20,51 +20,36 @@ let category = "";
 const defaultImage =
     "https://static-00.iconduck.com/assets.00/no-image-icon-2048x2048-2t5cx953.png";
 
-let totalArticles = 0; // 전체 기사수
-let pageSize = 10; // 한페이지에 보여줄 페이지수
-let totalPage = 0; // 총 페이지 수 : Math.ceil(totalArticles/pageSize)
+let totalResults = 0; // 전체 기사수
+const pageSize = 10; // 한페이지에 보여줄 페이지수
+const groupSize = 3; // 한그룹에 보여줄 페이지 수
 let pageNum = 1; // 현재 페이지넘버
-let pagePerGroup = 5; // 한페이지에 보여줄 페이지그룹 수
-let pageGroup = 0; //총 페이지 그룹 : Math.ceil(totalPage / pagePerGroup)
-let currentPageGroup = 1; // 현재 페이지 그룹 : Math.ceil(pageNum / pagePerGroup)
 
 // 뉴스 API 호출
-const getNews = async (getPageNum) => {
-    console.log("넘겨받은페이지번호", getPageNum);
-    pageNum = getPageNum;
-    console.log("현재페이지넘버1", pageNum);
+const getNews = async () => {
     let makeUrl = ``;
     if (category && category !== "") {
-        makeUrl = `${noonaURL}?category=${category}&pageSize=${
-            pageNum * pageSize
-        }`;
+        makeUrl = `${noonaURL}?category=${category}`;
     } else if (keyword && keyword !== "") {
-        makeUrl = `${noonaURL}?q=${keyword}&pageSize=${pageNum * pageSize}`;
+        makeUrl = `${noonaURL}?q=${keyword}`;
     } else {
-        makeUrl = `${noonaURL}?country=kr?&pageSize=${pageNum * pageSize}`;
+        makeUrl = `${noonaURL}?country=kr`;
     }
     const url = new URL(makeUrl);
     console.log("url", url);
     try {
         // url뒤에 쿼리들을 아래처럼 붙여줄 수 있다.
-        // url.searchParams.set("page", page); // &page=page
-        // url.searchParams.set("pageSize", pageSize); //&pageSize=pageSize
+        url.searchParams.set("page", pageNum); // &page=pageNum
+        url.searchParams.set("pageSize", pageSize); //&pageSize=pageSize
         const response = await fetch(url);
         const data = await response.json(); // json파일형태로 data변수에 선언
         console.log("data", data);
         if (response.status === 200) {
-            newsList = data.articles;
-            newsList.splice(0, (pageNum - 1) * pageSize);
-            console.log("잘라낸리스트", newsList);
-            if (newsList.length === 0) {
-                // document.getElementById("newsBoard").innerHTML =
-                //     "<div class='text-center p-3'>뉴스 결과 없음</div>";
+            if (data.articles.length === 0) {
                 throw new Error("검색결과가 없습니다."); // 여기로 들어오면 catch로 넘어감
             }
-            totalArticles = data.totalResults;
-            totalPage = Math.ceil(totalArticles / pageSize);
-            pageGroup = Math.ceil(totalPage / pagePerGroup);
-            console.log(totalArticles, totalPage, pageGroup);
+            newsList = data.articles;
+            totalResults = data.totalResults;
             render();
             pageRender();
         } else {
@@ -115,79 +100,55 @@ const render = () => {
 
 // pagination
 const pageRender = () => {
-    // console.log("현재페이지넘버2", pageNum);
-    let pageItems = "";
-    let endPage =
-        pagePerGroup > totalPage ? totalPage : currentPageGroup * pagePerGroup;
-    for (
-        let i = currentPageGroup * pagePerGroup - (pagePerGroup - 1);
-        i <= endPage;
-        i++
-    ) {
-        pageItems += `<li class="page-item"><a class="page-link ${
+    const totalPage = Math.ceil(totalResults / pageSize);
+    const pageGroup = Math.ceil(pageNum / groupSize);
+    let lastPage = pageGroup * groupSize;
+    // 마지막 페이지 그룹이 그룹사이즈보다 작을경우
+    if (lastPage > totalPage) {
+        lastPage = totalPage;
+    }
+    // 마지막페이지 그룹이 groupSize보다 작을 때에도 groupSize만큼 보여주기
+    const firstPage =
+        lastPage - (groupSize - 1) <= 0 ? 1 : lastPage - (groupSize - 1);
+    let pageHTML = ``;
+
+    if (pageNum > 1) {
+        pageHTML = `
+        <li class="page-item"><a class="page-link" href='#js-bottom' onclick="moveToPage(1)">&lt;&lt;</a></li>
+        <li class="page-item">
+                            <a class="page-link" href="#N" aria-label="Previous page" onclick="moveToPage(${
+                                pageNum - 1
+                            })">
+                                <span aria-hidden="true">&lt;</span>
+                            </a>
+                        </li>`;
+    }
+
+    for (let i = firstPage; i <= lastPage; i++) {
+        pageHTML += `<li class="page-item"><a class="page-link ${
             pageNum === i ? "active" : ""
-        }" href="#N" onclick="getNews(${i})">${i}</a></li>`;
+        }" href="#N" onclick="moveToPage(${i})">${i}</a></li>`;
     }
-    const pageHTML = `
-    ${
-        currentPageGroup > 1
-            ? `<li class="page-item">
-                        <a class="page-link" href="#N" aria-label="Previous page group" onclick="minusGroup()">
-                            <span aria-hidden="true">&laquo;</span>
-                        </a>
-                    </li>`
-            : ""
+
+    if (pageNum < totalPage) {
+        pageHTML += `<li class="page-item">
+        <a class="page-link" href="#N" aria-label="Next page Group" onclick="moveToPage(${
+            pageNum + 1
+        })">
+            <span aria-hidden="true">&gt;</span>
+        </a>
+    </li>
+    <li class="page-item">
+        <a class="page-link" href='#js-bottom' onclick="moveToPage(${totalPage})">&gt;&gt;</a>
+    </li>`;
     }
-    ${
-        pageNum > currentPageGroup * pagePerGroup - (pagePerGroup - 1)
-            ? `<li class="page-item">
-                        <a class="page-link" href="#N" aria-label="Previous" onclick="getNews(${
-                            pageNum - 1
-                        })">
-                            <span aria-hidden="true">&lt;</span>
-                        </a>
-                    </li>`
-            : ""
-    }
-                    
-                    ${pageItems}
-                    ${
-                        pageNum < currentPageGroup * pagePerGroup &&
-                        pageNum < totalPage
-                            ? `<li class="page-item">
-                        <a class="page-link" href="#N" aria-label="Next" onclick="getNews(${
-                            pageNum + 1
-                        })">
-                            <span aria-hidden="true">&gt;</span>
-                        </a>
-                    </li>`
-                            : ""
-                    }
-                    ${
-                        currentPageGroup === pageGroup
-                            ? ""
-                            : `<li class="page-item">
-                        <a class="page-link" href="#N" aria-label="Next page Group" onclick="plusGroup()
-                        ">
-                            <span aria-hidden="true">&raquo;</span>
-                        </a>
-                    </li>`
-                    }
-                    
-    `;
+
     document.querySelector(".pagination").innerHTML = pageHTML;
 };
 
-const plusGroup = () => {
-    currentPageGroup++;
-    pageNum = currentPageGroup * pagePerGroup - (pagePerGroup - 1);
-    getNews(pageNum);
-};
-
-const minusGroup = () => {
-    currentPageGroup--;
-    pageNum = currentPageGroup * pagePerGroup - (pagePerGroup - 1);
-    getNews(pageNum);
+const moveToPage = (page) => {
+    pageNum = page;
+    getNews();
 };
 
 // 키워드 검색
@@ -200,8 +161,8 @@ btnSearch.addEventListener("click", () => {
         alert("키워드를 입력하세요!");
     } else {
         keyword = iptKeyword.value;
-        currentPageGroup = 1;
-        getNews(1);
+        pageNum = 1;
+        getNews();
     }
 });
 btnSearch.addEventListener("keydown", function (e) {
@@ -212,8 +173,8 @@ btnSearch.addEventListener("keydown", function (e) {
             alert("키워드를 입력하세요!");
         } else {
             keyword = iptKeyword.value;
-            currentPageGroup = 1;
-            getNews(1);
+            pageNum = 1;
+            getNews();
         }
     }
 });
@@ -234,7 +195,7 @@ const categoryAll = document.querySelectorAll(".list-category > li > a"); //노�
 categoryAll.forEach((cate) => {
     cate.addEventListener("click", (event) => {
         keyword = "";
-        currentPageGroup = 1;
+        pageNum = 1;
         category = event.target.textContent;
         console.log("변경된 카테고리", category);
         if (isBrowserWidthBelow(maxScreenWidth)) {
@@ -242,7 +203,7 @@ categoryAll.forEach((cate) => {
             navBar.style.display = "none";
             document.querySelector("html").style.overflow = "auto";
         }
-        getNews(1);
+        getNews();
     });
 });
 
@@ -251,8 +212,8 @@ const btnHome = document.getElementById("btn-home");
 btnHome.addEventListener("click", function () {
     category = "";
     keyword = "";
-    currentPageGroup = 1;
-    getNews(1);
+    pageNum = 1;
+    getNews();
 });
 
 // UI
@@ -287,4 +248,4 @@ function isBrowserWidthBelow(maxWidth) {
 }
 
 // 첫 로딩 시 그리기
-getNews(1);
+getNews();
