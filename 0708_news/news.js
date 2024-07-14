@@ -7,9 +7,6 @@
 
 // pending : 보류중
 
-// pageSize : 기사갯수
-// page : 기사갯수가 10개면 10개의 기사가 있는 1page
-
 // 누나 API : https://beautiful-torte-d702c9.netlify.app/top-headlines?country=kr&apiKey=
 // https://newsapi.org/v2/top-headlines?country=kr&apiKey=70a9dc1efaba49299c95e70ba34ae4ab&pageSize=1
 // const API_KEY = `70a9dc1efaba49299c95e70ba34ae4ab`;
@@ -21,7 +18,7 @@ const defaultImage =
     "https://static-00.iconduck.com/assets.00/no-image-icon-2048x2048-2t5cx953.png";
 
 let totalResults = 0; // 전체 기사수
-const pageSize = 10; // 한페이지에 보여줄 페이지수
+const pageSize = 10; // 한페이지에 보여줄 기사수
 const groupSize = 3; // 한그룹에 보여줄 페이지 수
 let pageNum = 1; // 현재 페이지넘버
 
@@ -42,6 +39,7 @@ const getNews = async () => {
         url.searchParams.set("page", pageNum); // &page=pageNum
         url.searchParams.set("pageSize", pageSize); //&pageSize=pageSize
         const response = await fetch(url);
+        console.log("response:", response);
         const data = await response.json(); // json파일형태로 data변수에 선언
         console.log("data", data);
         if (response.status === 200) {
@@ -102,8 +100,9 @@ const render = () => {
 const pageRender = () => {
     const totalPage = Math.ceil(totalResults / pageSize);
     const pageGroup = Math.ceil(pageNum / groupSize);
+    // lastPage, firstPage를 구하는 식이 중요!!
     let lastPage = pageGroup * groupSize;
-    // 마지막 페이지 그룹이 그룹사이즈보다 작을경우
+    // 마지막 페이지가 그룹사이즈보다 작을경우
     if (lastPage > totalPage) {
         lastPage = totalPage;
     }
@@ -114,14 +113,14 @@ const pageRender = () => {
 
     if (pageNum > 1) {
         pageHTML = `
-        <li class="page-item"><a class="page-link" href='#js-bottom' onclick="moveToPage(1)">&lt;&lt;</a></li>
+        <li class="page-item"><a class="page-link" href='#N' aria-label="First page" onclick="moveToPage(1)">&lt;&lt;</a></li>
         <li class="page-item">
-                            <a class="page-link" href="#N" aria-label="Previous page" onclick="moveToPage(${
-                                pageNum - 1
-                            })">
-                                <span aria-hidden="true">&lt;</span>
-                            </a>
-                        </li>`;
+            <a class="page-link" href="#N" aria-label="Previous page" onclick="moveToPage(${
+                pageNum - 1
+            })">
+                <span aria-hidden="true">&lt;</span>
+            </a>
+        </li>`;
     }
 
     for (let i = firstPage; i <= lastPage; i++) {
@@ -132,14 +131,14 @@ const pageRender = () => {
 
     if (pageNum < totalPage) {
         pageHTML += `<li class="page-item">
-        <a class="page-link" href="#N" aria-label="Next page Group" onclick="moveToPage(${
+        <a class="page-link" href="#N" aria-label="Next page" onclick="moveToPage(${
             pageNum + 1
         })">
             <span aria-hidden="true">&gt;</span>
         </a>
     </li>
     <li class="page-item">
-        <a class="page-link" href='#js-bottom' onclick="moveToPage(${totalPage})">&gt;&gt;</a>
+        <a class="page-link" href='#N' aria-label="Last page" onclick="moveToPage(${totalPage})">&gt;&gt;</a>
     </li>`;
     }
 
@@ -194,6 +193,7 @@ const categoryAll = document.querySelectorAll(".list-category > li > a"); //노�
 
 categoryAll.forEach((cate) => {
     cate.addEventListener("click", (event) => {
+        iptKeyword.value = "";
         keyword = "";
         pageNum = 1;
         category = event.target.textContent;
@@ -210,6 +210,7 @@ categoryAll.forEach((cate) => {
 // 로고를 누르면 첫로딩때 처럼 topheadline으로 랜더링되기
 const btnHome = document.getElementById("btn-home");
 btnHome.addEventListener("click", function () {
+    iptKeyword.value = "";
     category = "";
     keyword = "";
     pageNum = 1;
