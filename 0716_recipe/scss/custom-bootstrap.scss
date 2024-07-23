@@ -1,0 +1,139 @@
+// custom-bootstrap.scss
+
+// Bootstrap variables
+$primary: rgb(191, 145, 126); // 새로운 primary 색상
+
+// Bootstrap의 SCSS 파일을 가져옵니다
+@import "bootstrap/scss/bootstrap";
+
+
+// style.css 에서 이동 
+.logo-top {
+    cursor: pointer;
+    color: rgb(147, 112, 98);
+}
+/* carousel 재정의 */
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+    width: 40px;
+    height: 40px;
+}
+.list-group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    gap: 30px;
+}
+
+.list-group > .card {
+    width: 18rem;
+    border-color: transparent;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.2);
+
+    > .card-img-top {
+        margin-left: -1px;
+        width: calc(100% + 2px);
+    }
+
+    &:hover {
+        transform: scale(1.02);   /* 이미지 확대 */
+        transition: transform .1s; 
+    }
+}
+
+.btn-primary {
+    color: #fff;
+}
+
+.card-body {
+    border-color: transparent !important;
+}
+
+.carousel-item {
+    a {
+        border: 0;
+    }
+}
+
+footer {
+    width: 100%;
+    font-size: 12px;
+
+    nav {
+        width: 100%;
+        display: flex;
+        padding: 8px;
+        align-items: center;
+        background-color: rgb(238, 238, 238);
+
+        > ul {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+            margin: 0;
+        }
+    }
+
+    .footer-info {
+        margin-top: 10px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    address {
+        margin: 0;
+        color: #757575;
+
+        > div {
+            margin: 5px 0;
+            > p {
+                display: inline-block;
+                margin: 0 10px 0 0;
+            }
+        }
+    }
+}
+
+.footer-logo {
+    align-self:flex-end;
+    margin-top:10px;
+    text-align: right;
+    color: #757575;
+
+    > h5 {
+        font-size: 1rem;
+        margin-bottom:0;
+        color: rgb(147, 112, 98);
+    }
+
+    > p {
+        margin:0;
+    }
+}
+
+.loading {
+    width: 100%;
+    height: 100%;
+    position: fixed;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    > .spinner-border {
+        position:absolute;
+        z-index:2;
+    }
+
+    > .bg {
+        position:absolute;
+        top:0;
+        left:0;
+        width:100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.3);
+        z-index:1;
+    }
+}

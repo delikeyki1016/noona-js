@@ -11844,6 +11844,11 @@ textarea.form-control-lg {
     display: none !important;
   }
 }
+.logo-top {
+  cursor: pointer;
+  color: rgb(147, 112, 98);
+}
+
 /* carousel 재정의 */
 .carousel-control-prev-icon,
 .carousel-control-next-icon {
@@ -11867,6 +11872,10 @@ textarea.form-control-lg {
 .list-group > .card > .card-img-top {
   margin-left: -1px;
   width: calc(100% + 2px);
+}
+.list-group > .card:hover {
+  transform: scale(1.02); /* 이미지 확대 */
+  transition: transform 0.1s;
 }
 
 .btn-primary {
@@ -11929,6 +11938,29 @@ footer address > div > p {
 }
 .footer-logo > p {
   margin: 0;
+}
+
+.loading {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.loading > .spinner-border {
+  position: absolute;
+  z-index: 2;
+}
+.loading > .bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  z-index: 1;
 }
 
 /*# sourceMappingURL=custom-bootstrap.css.map */
